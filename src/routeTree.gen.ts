@@ -9,50 +9,153 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as PublicRouteImport } from './routes/_public'
+import { Route as PublicIndexRouteImport } from './routes/_public.index'
+import { Route as PublicAboutRouteImport } from './routes/_public.about'
+import { Route as PublicVocabularyRouteImport } from './routes/_public.vocabulary'
+import { Route as PublicJourneyIndexRouteImport } from './routes/_public.journey.index'
+import { Route as PublicJourneyDayDayRouteImport } from './routes/_public.journey.day.$day'
 
-const IndexRoute = IndexRouteImport.update({
+const PublicRoute = PublicRouteImport.update({
+  id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicAboutRoute = PublicAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicVocabularyRoute = PublicVocabularyRouteImport.update({
+  id: '/vocabulary',
+  path: '/vocabulary',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicJourneyIndexRoute = PublicJourneyIndexRouteImport.update({
+  id: '/journey/',
+  path: '/journey/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicJourneyDayDayRoute = PublicJourneyDayDayRouteImport.update({
+  id: '/journey/day/$day',
+  path: '/journey/day/$day',
+  getParentRoute: () => PublicRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof PublicIndexRoute
+  '/about': typeof PublicAboutRoute
+  '/vocabulary': typeof PublicVocabularyRoute
+  '/journey/': typeof PublicJourneyIndexRoute
+  '/journey/day/$day': typeof PublicJourneyDayDayRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/about': typeof PublicAboutRoute
+  '/vocabulary': typeof PublicVocabularyRoute
+  '/': typeof PublicIndexRoute
+  '/journey': typeof PublicJourneyIndexRoute
+  '/journey/day/$day': typeof PublicJourneyDayDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_public': typeof PublicRouteWithChildren
+  '/_public/about': typeof PublicAboutRoute
+  '/_public/vocabulary': typeof PublicVocabularyRoute
+  '/_public/': typeof PublicIndexRoute
+  '/_public/journey/': typeof PublicJourneyIndexRoute
+  '/_public/journey/day/$day': typeof PublicJourneyDayDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/about' | '/vocabulary' | '/journey/' | '/journey/day/$day'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/about' | '/vocabulary' | '/' | '/journey' | '/journey/day/$day'
+  id:
+    | '__root__'
+    | '/_public'
+    | '/_public/about'
+    | '/_public/vocabulary'
+    | '/_public/'
+    | '/_public/journey/'
+    | '/_public/journey/day/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  PublicRoute: typeof PublicRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_public/': {
+      id: '/_public/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/about': {
+      id: '/_public/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof PublicAboutRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/vocabulary': {
+      id: '/_public/vocabulary'
+      path: '/vocabulary'
+      fullPath: '/vocabulary'
+      preLoaderRoute: typeof PublicVocabularyRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/journey/': {
+      id: '/_public/journey/'
+      path: '/journey'
+      fullPath: '/journey/'
+      preLoaderRoute: typeof PublicJourneyIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/journey/day/$day': {
+      id: '/_public/journey/day/$day'
+      path: '/journey/day/$day'
+      fullPath: '/journey/day/$day'
+      preLoaderRoute: typeof PublicJourneyDayDayRouteImport
+      parentRoute: typeof PublicRoute
     }
   }
 }
 
+interface PublicRouteChildren {
+  PublicAboutRoute: typeof PublicAboutRoute
+  PublicVocabularyRoute: typeof PublicVocabularyRoute
+  PublicIndexRoute: typeof PublicIndexRoute
+  PublicJourneyIndexRoute: typeof PublicJourneyIndexRoute
+  PublicJourneyDayDayRoute: typeof PublicJourneyDayDayRoute
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicAboutRoute: PublicAboutRoute,
+  PublicVocabularyRoute: PublicVocabularyRoute,
+  PublicIndexRoute: PublicIndexRoute,
+  PublicJourneyIndexRoute: PublicJourneyIndexRoute,
+  PublicJourneyDayDayRoute: PublicJourneyDayDayRoute,
+}
+
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  PublicRoute: PublicRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
