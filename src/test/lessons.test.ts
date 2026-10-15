@@ -24,7 +24,7 @@ describe("lesson stats", () => {
   });
   it("latest lesson is the most recent date", () => {
     const list = buildLessons({ "/a/day-001.md": md(1, 10), "/a/day-003.md": md(3, 10) });
-    expect(computeStats(list).latest[0].day).toBe(3);
+    expect(computeStats(list).latest[0]?.day).toBe(3);
   });
   it("extracts Google Drive file id", () => {
     expect(extractDriveFileId("https://drive.google.com/file/d/1AbCdEfGhIjK/view")).toBe("1AbCdEfGhIjK");
