@@ -1,9 +1,9 @@
 export function extractDriveFileId(url: string): string | null {
   if (!url) return null;
   const byPath = url.match(/\/(?:file\/)?d\/([A-Za-z0-9_-]{10,})/);
-  if (byPath) return byPath[1];
+  if (byPath) return byPath[1] ?? null;
   const byQuery = url.match(/[?&]id=([A-Za-z0-9_-]{10,})/);
-  if (byQuery) return byQuery[1];
+  if (byQuery) return byQuery[1] ?? null;
   return null;
 }
 
