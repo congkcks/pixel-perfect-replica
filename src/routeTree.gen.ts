@@ -10,14 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
 import { Route as PublicAboutRouteImport } from './routes/_public.about'
 import { Route as PublicVocabularyRouteImport } from './routes/_public.vocabulary'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PublicJourneyIndexRouteImport } from './routes/_public.journey.index'
+import { Route as AdminLessonsIndexRouteImport } from './routes/admin.lessons.index'
+import { Route as AdminLessonsNewRouteImport } from './routes/admin.lessons.new'
 import { Route as PublicJourneyDayDayRouteImport } from './routes/_public.journey.day.$day'
+import { Route as AdminLessonsDayEditRouteImport } from './routes/admin.lessons.$day.edit'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -35,57 +45,116 @@ const PublicVocabularyRoute = PublicVocabularyRouteImport.update({
   path: '/vocabulary',
   getParentRoute: () => PublicRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const PublicJourneyIndexRoute = PublicJourneyIndexRouteImport.update({
   id: '/journey/',
   path: '/journey/',
   getParentRoute: () => PublicRoute,
+} as any)
+const AdminLessonsIndexRoute = AdminLessonsIndexRouteImport.update({
+  id: '/lessons/',
+  path: '/lessons/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLessonsNewRoute = AdminLessonsNewRouteImport.update({
+  id: '/lessons/new',
+  path: '/lessons/new',
+  getParentRoute: () => AdminRoute,
 } as any)
 const PublicJourneyDayDayRoute = PublicJourneyDayDayRouteImport.update({
   id: '/journey/day/$day',
   path: '/journey/day/$day',
   getParentRoute: () => PublicRoute,
 } as any)
+const AdminLessonsDayEditRoute = AdminLessonsDayEditRouteImport.update({
+  id: '/lessons/$day/edit',
+  path: '/lessons/$day/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/about': typeof PublicAboutRoute
   '/vocabulary': typeof PublicVocabularyRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/lessons/new': typeof AdminLessonsNewRoute
   '/journey/': typeof PublicJourneyIndexRoute
+  '/admin/lessons/': typeof AdminLessonsIndexRoute
   '/journey/day/$day': typeof PublicJourneyDayDayRoute
+  '/admin/lessons/$day/edit': typeof AdminLessonsDayEditRoute
 }
 export interface FileRoutesByTo {
   '/about': typeof PublicAboutRoute
   '/vocabulary': typeof PublicVocabularyRoute
   '/': typeof PublicIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/lessons/new': typeof AdminLessonsNewRoute
   '/journey': typeof PublicJourneyIndexRoute
+  '/admin/lessons': typeof AdminLessonsIndexRoute
   '/journey/day/$day': typeof PublicJourneyDayDayRoute
+  '/admin/lessons/$day/edit': typeof AdminLessonsDayEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/_public/about': typeof PublicAboutRoute
   '/_public/vocabulary': typeof PublicVocabularyRoute
   '/_public/': typeof PublicIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/lessons/new': typeof AdminLessonsNewRoute
   '/_public/journey/': typeof PublicJourneyIndexRoute
+  '/admin/lessons/': typeof AdminLessonsIndexRoute
   '/_public/journey/day/$day': typeof PublicJourneyDayDayRoute
+  '/admin/lessons/$day/edit': typeof AdminLessonsDayEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/vocabulary' | '/journey/' | '/journey/day/$day'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/about'
+    | '/vocabulary'
+    | '/admin/'
+    | '/admin/lessons/new'
+    | '/journey/'
+    | '/admin/lessons/'
+    | '/journey/day/$day'
+    | '/admin/lessons/$day/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about' | '/vocabulary' | '/' | '/journey' | '/journey/day/$day'
+  to:
+    | '/about'
+    | '/vocabulary'
+    | '/'
+    | '/admin'
+    | '/admin/lessons/new'
+    | '/journey'
+    | '/admin/lessons'
+    | '/journey/day/$day'
+    | '/admin/lessons/$day/edit'
   id:
     | '__root__'
     | '/_public'
+    | '/admin'
     | '/_public/about'
     | '/_public/vocabulary'
     | '/_public/'
+    | '/admin/'
+    | '/admin/lessons/new'
     | '/_public/journey/'
+    | '/admin/lessons/'
     | '/_public/journey/day/$day'
+    | '/admin/lessons/$day/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -95,6 +164,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -118,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicVocabularyRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_public/journey/': {
       id: '/_public/journey/'
       path: '/journey'
@@ -125,12 +208,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicJourneyIndexRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/admin/lessons/': {
+      id: '/admin/lessons/'
+      path: '/lessons'
+      fullPath: '/admin/lessons/'
+      preLoaderRoute: typeof AdminLessonsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/lessons/new': {
+      id: '/admin/lessons/new'
+      path: '/lessons/new'
+      fullPath: '/admin/lessons/new'
+      preLoaderRoute: typeof AdminLessonsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_public/journey/day/$day': {
       id: '/_public/journey/day/$day'
       path: '/journey/day/$day'
       fullPath: '/journey/day/$day'
       preLoaderRoute: typeof PublicJourneyDayDayRouteImport
       parentRoute: typeof PublicRoute
+    }
+    '/admin/lessons/$day/edit': {
+      id: '/admin/lessons/$day/edit'
+      path: '/lessons/$day/edit'
+      fullPath: '/admin/lessons/$day/edit'
+      preLoaderRoute: typeof AdminLessonsDayEditRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
@@ -154,8 +258,25 @@ const PublicRouteChildren: PublicRouteChildren = {
 const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminLessonsNewRoute: typeof AdminLessonsNewRoute
+  AdminLessonsIndexRoute: typeof AdminLessonsIndexRoute
+  AdminLessonsDayEditRoute: typeof AdminLessonsDayEditRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminLessonsNewRoute: AdminLessonsNewRoute,
+  AdminLessonsIndexRoute: AdminLessonsIndexRoute,
+  AdminLessonsDayEditRoute: AdminLessonsDayEditRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
