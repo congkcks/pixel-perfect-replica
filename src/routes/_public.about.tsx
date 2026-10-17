@@ -5,6 +5,7 @@ import {
   Linkedin, Mail, MapPin, Music, Quote, Server, Sparkles, Trophy, Wrench,
 } from "lucide-react";
 import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import portraitImg from "@/assets/portrait-placeholder.jpg";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/public/shared";
@@ -26,8 +27,8 @@ export const Route = createFileRoute("/_public/about")({
   component: About,
 });
 
-const skillIcons = [Brain, Server, Code2, Wrench, FlaskConical];
-const hobbyIcons: Record<string, typeof Trophy> = { trophy: Trophy, gamepad: Gamepad2, music: Music };
+const skillIcons: LucideIcon[] = [Brain, Server, Code2, Wrench, FlaskConical];
+const hobbyIcons: Record<string, LucideIcon> = { trophy: Trophy, gamepad: Gamepad2, music: Music };
 const floatingTags = ["Computer Vision", "AI Enthusiast", "English Learner"];
 
 const fadeUp = {
