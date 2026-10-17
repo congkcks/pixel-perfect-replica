@@ -24,7 +24,7 @@ function downloadText(text: string, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
-export function LessonEditor({ heading, initial, autoImport }: { heading: string; initial: LessonDraft; autoImport?: boolean }) {
+export function LessonEditor({ heading, initial, autoImport }: { heading: string; initial: LessonDraft; autoImport?: boolean | undefined }) {
   const [d, setD] = useState(initial);
   const [tab, setTab] = useState<"edit" | "preview">("edit");
   const [publicView, setPublicView] = useState(false);
