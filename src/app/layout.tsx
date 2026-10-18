@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     google:
       process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"] ||
       process.env["GOOGLE_SITE_VERIFICATION"] ||
-      "googleec28a1d38a66df9c",
+      "googleeec28a1d38a66df9c",
   },
   openGraph: {
     type: "website",
