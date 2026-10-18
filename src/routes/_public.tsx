@@ -22,27 +22,45 @@ function PublicLayout() {
           <Logo />
           <nav className="hidden gap-8 text-sm md:flex">
             {nav.map((n) => (
-              <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }}
+              <Link
+                key={n.to}
+                to={n.to}
+                activeOptions={{ exact: n.to === "/" }}
                 className="py-5 text-muted-foreground transition-colors hover:text-foreground"
-                activeProps={{ className: "border-b-2 border-primary !text-primary font-medium" }}>
+                activeProps={{ className: "border-b-2 border-primary !text-primary font-medium" }}
+              >
                 {n.label}
               </Link>
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Button asChild className="hidden rounded-xl sm:inline-flex"><Link to="/journey">Bắt đầu hành trình</Link></Button>
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu"><Menu /></Button>
+            <Button asChild className="hidden rounded-xl sm:inline-flex">
+              <Link to="/journey">Bắt đầu hành trình</Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setOpen(!open)}
+              aria-label="Menu"
+            >
+              <Menu />
+            </Button>
           </div>
         </div>
         {open && (
           <nav className="flex flex-col border-t px-4 py-2 md:hidden">
             {nav.map((n) => (
-              <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="py-2 text-sm">{n.label}</Link>
+              <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="py-2 text-sm">
+                {n.label}
+              </Link>
             ))}
           </nav>
         )}
       </header>
-      <main className="flex-1"><Outlet /></main>
+      <main className="flex-1">
+        <Outlet />
+      </main>
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
         Không cần hoàn hảo, chỉ cần tiến bộ mỗi ngày · 100 Ngày Học Tiếng Anh
       </footer>

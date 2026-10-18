@@ -1,21 +1,23 @@
-import { countVocabulary, parseFrontmatter } from "./markdown";
+"use client";
 
-export const TOTAL_DAYS = 100;
+import { useState, useEffect } from "react";
+import type { LessonDraft } from "./lesson-file";
+import {
+  TOTAL_DAYS,
+  STORAGE_KEY,
+  LESSONS_CHANGED_EVENT,
+  type Lesson,
+  pad,
+  fileNameFor,
+  draftToLessonObject,
+  parseLesson,
+  buildLessons,
+  computeStats,
+  formatDate,
+  extractVocabulary,
+} from "./lessons-core";
 
-export type Lesson = {
-  day: number;
-  title: string;
-  date: string;
-  category: string;
-  level: string;
-  duration: number;
-  pdfUrl: string;
-  description: string;
-  content: string;
-  raw: string;
-  vocabCount: number;
-  fileName: string;
-};
+export * from "./lessons-core";
 
 const files = import.meta.glob("/content/lessons/*.md", {
   query: "?raw",
@@ -23,91 +25,119 @@ const files = import.meta.glob("/content/lessons/*.md", {
   eager: true,
 }) as Record<string, string>;
 
-export function parseLesson(raw: string, fileName = ""): Lesson | null {
-  const { data, content } = parseFrontmatter(raw);
-  const fromName = fileName.match(/day-(\d+)/i)?.[1];
-  const day = Number(data['day'] ?? fromName);
-  if (!Number.isInteger(day) || day < 1 || day > TOTAL_DAYS) return null;
-  return {
-    day,
-    title: String(data['title'] ?? `Ngày ${day}`),
-    date: String(data['date'] ?? ""),
-    category: String(data['category'] ?? "General"),
-    level: String(data['level'] ?? ""),
-    duration: Number(data['duration']) || 0,
-    pdfUrl: String(data['pdf_url'] ?? ""),
-    description: String(data['description'] ?? ""),
-    content,
-    raw,
-    vocabCount: countVocabulary(content),
-    fileName,
-  };
-}
-
-/** Build a deduplicated, day-sorted lesson list (first file wins per day). */
-export function buildLessons(sources: Record<string, string>): Lesson[] {
-  const byDay = new Map<number, Lesson>();
-  for (const path of Object.keys(sources).sort()) {
-    const name = path.split("/").pop() ?? path;
-    const lesson = parseLesson(sources[path] ?? "", name);
-    if (lesson && !byDay.has(lesson.day)) byDay.set(lesson.day, lesson);
-  }
-  return [...byDay.values()].sort((a, b) => a.day - b.day);
-}
-
 export const lessons: Lesson[] = buildLessons(files);
+export const stats = computeStats(lessons);
+
+export function getStoredLessons(): Record<number, LessonDraft> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function isLessonCustom(day: number): boolean {
+  const stored = getStoredLessons();
+  return Boolean(stored[day]);
+}
+
+export function syncLessonsWithStorage(): Lesson[] {
+  const base = buildLessons(files);
+  if (typeof window === "undefined") {
+    lessons.splice(0, lessons.length, ...base);
+    Object.assign(stats, computeStats(lessons));
+    return lessons;
+  }
+
+  const stored = getStoredLessons();
+  const map = new Map<number, Lesson>();
+  for (const l of base) {
+    map.set(l.day, l);
+  }
+  for (const [dayStr, draft] of Object.entries(stored)) {
+    const day = Number(dayStr);
+    if (Number.isInteger(day) && day >= 1 && day <= TOTAL_DAYS) {
+      map.set(day, draftToLessonObject(draft));
+    }
+  }
+  const merged = [...map.values()].sort((a, b) => a.day - b.day);
+  lessons.splice(0, lessons.length, ...merged);
+  Object.assign(stats, computeStats(lessons));
+  return lessons;
+}
+
+export function saveLessonToStorage(draft: LessonDraft): Lesson {
+  const stored = getStoredLessons();
+  stored[draft.day] = draft;
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+    window.dispatchEvent(new CustomEvent(LESSONS_CHANGED_EVENT, { detail: { day: draft.day } }));
+  }
+  syncLessonsWithStorage();
+  return getLesson(draft.day)!;
+}
+
+export function deleteLessonFromStorage(day: number): void {
+  const stored = getStoredLessons();
+  if (stored[day]) {
+    delete stored[day];
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+      window.dispatchEvent(new CustomEvent(LESSONS_CHANGED_EVENT, { detail: { day } }));
+    }
+    syncLessonsWithStorage();
+  }
+}
+
+export function resetStorageLessons(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(LESSONS_CHANGED_EVENT, { detail: { reset: true } }));
+  }
+  syncLessonsWithStorage();
+}
+
+// Auto sync on client import
+if (typeof window !== "undefined") {
+  syncLessonsWithStorage();
+}
 
 export function getLesson(day: number) {
+  if (typeof window !== "undefined" && !lessons.length) {
+    syncLessonsWithStorage();
+  }
   return lessons.find((l) => l.day === day);
 }
 
-export function computeStats(list: Lesson[]) {
-  const completed = list.length;
-  const totalMinutes = list.reduce((s, l) => s + l.duration, 0);
-  const latest = [...list].sort((a, b) => (b.date || "").localeCompare(a.date || "") || b.day - a.day);
+export function useLessons() {
+  const [currentLessons, setCurrentLessons] = useState<Lesson[]>(() => [...lessons]);
+
+  useEffect(() => {
+    syncLessonsWithStorage();
+    setCurrentLessons([...lessons]);
+
+    const handleUpdate = () => {
+      syncLessonsWithStorage();
+      setCurrentLessons([...lessons]);
+    };
+
+    window.addEventListener(LESSONS_CHANGED_EVENT, handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener(LESSONS_CHANGED_EVENT, handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
+  }, []);
+
   return {
-    completed,
-    progress: Math.round((completed / TOTAL_DAYS) * 1000) / 10,
-    hours: Math.round((totalMinutes / 60) * 10) / 10,
-    vocab: list.reduce((s, l) => s + l.vocabCount, 0),
-    latest,
+    lessons: currentLessons,
+    stats: computeStats(currentLessons),
+    getLesson: (day: number) => currentLessons.find((l) => l.day === day),
+    saveLesson: saveLessonToStorage,
+    deleteLesson: deleteLessonFromStorage,
+    resetLessons: resetStorageLessons,
+    isCustom: isLessonCustom,
   };
-}
-
-export const stats = computeStats(lessons);
-
-export const pad = (n: number, len = 2) => String(n).padStart(len, "0");
-export const fileNameFor = (day: number) => `day-${pad(day, 3)}.md`;
-
-export function formatDate(date: string) {
-  if (!date) return "";
-  const d = new Date(date + "T00:00:00");
-  if (isNaN(d.getTime())) return date;
-  return `${d.getDate()} Thg ${d.getMonth() + 1}, ${d.getFullYear()}`;
-}
-
-/** Extract vocabulary rows from lesson tables for the vocabulary page. */
-export function extractVocabulary(lesson: Lesson) {
-  const rows: { word: string; ipa: string; meaning: string; day: number }[] = [];
-  const lines = lesson.content.split("\n");
-  let inVocab = false;
-  for (let i = 0; i < lines.length; i++) {
-    const line = (lines[i] ?? "").trim();
-    const h = line.match(/^#{1,6}\s+(.*)$/);
-    if (h) { inVocab = /từ vựng|vocabulary/i.test(h[1] ?? ""); continue; }
-    if (line.startsWith("|") && /^\|?\s*:?-{2,}/.test(lines[i + 1]?.trim() ?? "")) {
-      const first = line.split("|").map((c) => c.trim()).filter(Boolean)[0] ?? "";
-      const isVocab = inVocab || /^(english|từ vựng|word|vocabulary|từ)$/i.test(first);
-      let j = i + 2;
-      while (j < lines.length && (lines[j] ?? "").trim().startsWith("|")) {
-        if (isVocab) {
-          const c = (lines[j] ?? "").trim().replace(/^\||\|$/g, "").split("|").map((x) => x.trim());
-          rows.push({ word: c[0] ?? "", ipa: c[1] ?? "", meaning: c[2] ?? "", day: lesson.day });
-        }
-        j++;
-      }
-      i = j - 1;
-    }
-  }
-  return rows;
 }

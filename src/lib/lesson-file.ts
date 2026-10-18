@@ -1,5 +1,5 @@
-import { parseFrontmatter, stringifyFrontmatter } from "./markdown";
-import { TOTAL_DAYS, fileNameFor, type Lesson } from "./lessons";
+import { countVocabulary, parseFrontmatter, stringifyFrontmatter } from "./markdown";
+import { TOTAL_DAYS, fileNameFor, type Lesson } from "./lessons-core";
 
 export type LessonDraft = {
   day: number;
@@ -11,17 +11,49 @@ export type LessonDraft = {
   pdfUrl: string;
   description: string;
   content: string;
+  completed: boolean;
 };
 
-export const CATEGORIES = ["Speaking", "Listening", "Reading", "Writing", "Grammar", "Vocabulary", "Communication", "General"];
+export const CATEGORIES = [
+  "Speaking",
+  "Listening",
+  "Reading",
+  "Writing",
+  "Grammar",
+  "Vocabulary",
+  "Communication",
+  "General",
+];
 export const LEVELS = ["Beginner", "Elementary", "Intermediate", "Upper-Intermediate", "Advanced"];
 
 export function emptyDraft(day = 1): LessonDraft {
-  return { day, title: "", date: "", category: "Speaking", level: "Beginner", duration: 60, pdfUrl: "", description: "", content: "" };
+  return {
+    day,
+    title: "",
+    date: "",
+    category: "Speaking",
+    level: "Beginner",
+    duration: 60,
+    pdfUrl: "",
+    description: "",
+    content: "",
+    completed: true,
+  };
 }
 
 export function draftFromLesson(l: Lesson): LessonDraft {
-  return { day: l.day, title: l.title, date: l.date, category: l.category, level: l.level, duration: l.duration, pdfUrl: l.pdfUrl, description: l.description, content: l.content.trim() };
+  return {
+    day: l.day,
+    title: l.title,
+    date: l.date,
+    category: l.category,
+    level: l.level,
+    duration: l.duration,
+    pdfUrl: l.pdfUrl,
+    description: l.description,
+    content: l.content.trim(),
+    completed: l.completed ?? true,
+  };
 }
 
 /** Parse an imported .md file; metadata missing from the file keeps the current value. */
@@ -40,12 +72,24 @@ export function draftFromMarkdown(raw: string, fallback: LessonDraft, fileName =
     pdfUrl: str("pdf_url", fallback.pdfUrl),
     description: str("description", fallback.description),
     content: content.trim(),
+    completed:
+      data["completed"] !== undefined ? Boolean(data["completed"]) : (fallback.completed ?? true),
   };
 }
 
 export function draftToMarkdown(d: LessonDraft): string {
   return stringifyFrontmatter(
-    { day: d.day, title: d.title, date: d.date, category: d.category, level: d.level, duration: d.duration, pdf_url: d.pdfUrl, description: d.description },
+    {
+      day: d.day,
+      title: d.title,
+      date: d.date,
+      category: d.category,
+      level: d.level,
+      duration: d.duration,
+      pdf_url: d.pdfUrl,
+      description: d.description,
+      completed: d.completed ?? true,
+    },
     d.content,
   );
 }
@@ -53,5 +97,11 @@ export function draftToMarkdown(d: LessonDraft): string {
 export const exportFileName = (d: LessonDraft) => fileNameFor(d.day);
 
 export function draftToLesson(d: LessonDraft): Lesson {
-  return { ...d, raw: "", vocabCount: 0, fileName: exportFileName(d) };
+  return {
+    ...d,
+    raw: draftToMarkdown(d),
+    vocabCount: countVocabulary(d.content),
+    fileName: exportFileName(d),
+    completed: d.completed ?? true,
+  };
 }

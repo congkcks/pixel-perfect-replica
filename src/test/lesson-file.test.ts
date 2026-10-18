@@ -7,7 +7,13 @@ describe("admin markdown import/export", () => {
     expect(exportFileName({ ...emptyDraft(), day: 7 })).toBe("day-007.md");
   });
   it("exported file reads back through the public lesson parser", () => {
-    const md = draftToMarkdown({ ...emptyDraft(12), title: 'Say "hi"', duration: 45, pdfUrl: "https://x", content: "# Hi" });
+    const md = draftToMarkdown({
+      ...emptyDraft(12),
+      title: 'Say "hi"',
+      duration: 45,
+      pdfUrl: "https://x",
+      content: "# Hi",
+    });
     const l = parseLesson(md, "day-012.md");
     expect(l?.day).toBe(12);
     expect(l?.title).toBe('Say "hi"');
@@ -20,5 +26,15 @@ describe("admin markdown import/export", () => {
   });
   it("rejects days outside 1-100", () => {
     expect(draftFromMarkdown("---\nday: 101\n---\nx", emptyDraft(3)).day).toBe(3);
+  });
+  it("preserves completed status in markdown frontmatter", () => {
+    const md = draftToMarkdown({
+      ...emptyDraft(15),
+      title: "Learning verbs",
+      completed: false,
+    });
+    expect(md).toContain("completed: false");
+    const parsed = draftFromMarkdown(md, emptyDraft(15));
+    expect(parsed.completed).toBe(false);
   });
 });

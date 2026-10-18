@@ -1,7 +1,10 @@
 // Minimal, browser-safe YAML frontmatter parser for flat key: value pairs.
 export type FrontmatterValue = string | number | boolean;
 
-export function parseFrontmatter(raw: string): { data: Record<string, FrontmatterValue>; content: string } {
+export function parseFrontmatter(raw: string): {
+  data: Record<string, FrontmatterValue>;
+  content: string;
+} {
   const text = raw.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
   const match = text.match(/^---\n([\s\S]*?)\n---\n?/);
   if (!match) return { data: {}, content: text };
@@ -24,7 +27,10 @@ export function parseFrontmatter(raw: string): { data: Record<string, Frontmatte
   return { data, content: text.slice(match[0].length) };
 }
 
-export function stringifyFrontmatter(data: Record<string, FrontmatterValue>, content: string): string {
+export function stringifyFrontmatter(
+  data: Record<string, FrontmatterValue>,
+  content: string,
+): string {
   const lines = Object.entries(data).map(([k, v]) =>
     typeof v === "string" ? `${k}: "${v.replace(/"/g, '\\"')}"` : `${k}: ${v}`,
   );
@@ -46,7 +52,11 @@ export function countVocabulary(content: string): number {
     }
     const next = lines[i + 1]?.trim() ?? "";
     if (line.startsWith("|") && /^\|?\s*:?-{2,}/.test(next)) {
-      const firstHeader = line.split("|").map((c) => c.trim()).filter(Boolean)[0] ?? "";
+      const firstHeader =
+        line
+          .split("|")
+          .map((c) => c.trim())
+          .filter(Boolean)[0] ?? "";
       const isVocab = inVocabSection || /^(english|từ vựng|word|vocabulary|từ)$/i.test(firstHeader);
       let j = i + 2;
       while (j < lines.length && (lines[j] ?? "").trim().startsWith("|")) {

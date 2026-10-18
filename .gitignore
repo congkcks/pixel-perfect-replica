@@ -15,6 +15,14 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+.env
+.env*.local
+.env.local
+
+# Next.js & TypeScript build artifacts
+.next/
+out/
+tsconfig.tsbuildinfo
 
 # Wrangler / Cloudflare
 .wrangler/

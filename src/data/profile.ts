@@ -58,11 +58,24 @@ export const profile = {
   skillGroups: [
     {
       name: "Computer Vision & AI",
-      skills: ["YOLOv8 / YOLOv11", "OpenCV", "PyTorch", "Object Detection & Tracking", "Google Gemini API", "Whisper STT"],
+      skills: [
+        "YOLOv8 / YOLOv11",
+        "OpenCV",
+        "PyTorch",
+        "Object Detection & Tracking",
+        "Google Gemini API",
+        "Whisper STT",
+      ],
     },
     {
       name: "Backend",
-      skills: ["ASP.NET Core", "Entity Framework Core", "PostgreSQL", "Java Spring", "Python FastAPI / Flask"],
+      skills: [
+        "ASP.NET Core",
+        "Entity Framework Core",
+        "PostgreSQL",
+        "Java Spring",
+        "Python FastAPI / Flask",
+      ],
     },
     {
       name: "Frontend",
@@ -96,21 +109,24 @@ export const profile = {
     },
     {
       name: "English Mentor Buddy",
-      description: "Ứng dụng trợ lý AI hỗ trợ luyện tiếng Anh, tương tác hội thoại và phản hồi cá nhân hóa.",
+      description:
+        "Ứng dụng trợ lý AI hỗ trợ luyện tiếng Anh, tương tác hội thoại và phản hồi cá nhân hóa.",
       tech: ["ReactJS", "ASP.NET Core", "PostgreSQL", "AI"],
       github: "https://github.com/congkcks/english-mentor-buddy",
       theme: "mentor",
     },
     {
       name: "TOEIC Ace Path 18",
-      description: "Nền tảng hỗ trợ luyện thi TOEIC với lộ trình học, bài luyện tập và theo dõi tiến độ.",
+      description:
+        "Nền tảng hỗ trợ luyện thi TOEIC với lộ trình học, bài luyện tập và theo dõi tiến độ.",
       tech: ["Web", "Lộ trình học", "Theo dõi tiến độ"],
       github: "https://github.com/congkcks/toeic-ace-path-18",
       theme: "toeic",
     },
     {
       name: "EngAce",
-      description: "Nền tảng học tiếng Anh đa kỹ năng, tích hợp Gemini API để hỗ trợ luyện tập và phản hồi.",
+      description:
+        "Nền tảng học tiếng Anh đa kỹ năng, tích hợp Gemini API để hỗ trợ luyện tập và phản hồi.",
       tech: ["ASP.NET Core", "ReactJS", "PostgreSQL", "Gemini API"],
       github: null,
       theme: "engace",
@@ -131,7 +147,11 @@ export const profile = {
   ],
   hobbies: [
     { name: "Manchester United", description: "Fan Manchester United. GGMU!", icon: "trophy" },
-    { name: "FC Online", description: "Yêu thích bóng đá và xây dựng đội hình trong FC Online.", icon: "gamepad" },
+    {
+      name: "FC Online",
+      description: "Yêu thích bóng đá và xây dựng đội hình trong FC Online.",
+      icon: "gamepad",
+    },
     { name: "Âm nhạc", description: "Nghe nhạc để thư giãn và tìm cảm hứng.", icon: "music" },
   ],
   socials: {

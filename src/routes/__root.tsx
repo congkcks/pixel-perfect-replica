@@ -78,12 +78,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Hành Trình 100 Ngày Học Tiếng Anh – Vũ Văn Hà Công" },
-      { name: "description", content: "Hành trình 100 ngày học tiếng Anh của Vũ Văn Hà Công: bài học mỗi ngày, từ vựng, tài liệu PDF và ghi chú." },
-      { property: "og:title", content: "Hành Trình 100 Ngày Học Tiếng Anh – Vũ Văn Hà Công" },
-      { property: "og:description", content: "Hành trình 100 ngày học tiếng Anh của Vũ Văn Hà Công: bài học mỗi ngày, từ vựng, tài liệu PDF và ghi chú." },
+      { title: "Vũ Văn Hà Công | Hành Trình 100 Ngày Học Tiếng Anh" },
+      {
+        name: "description",
+        content:
+          "Khám phá hành trình 100 ngày tự học tiếng Anh của Vũ Văn Hà Công (Hà Công). Theo dõi bài học mỗi ngày, từ vựng, tài liệu và tiến độ học tập.",
+      },
+      { property: "og:site_name", content: "Vũ Văn Hà Công | Hành Trình 100 Ngày Học Tiếng Anh" },
+      { property: "og:title", content: "Vũ Văn Hà Công | Hành Trình 100 Ngày Học Tiếng Anh" },
+      {
+        property: "og:description",
+        content:
+          "Khám phá hành trình 100 ngày tự học tiếng Anh của Vũ Văn Hà Công (Hà Công). Theo dõi bài học mỗi ngày, từ vựng, tài liệu và tiến độ học tập.",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "vi_VN" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Vũ Văn Hà Công | Hành Trình 100 Ngày Học Tiếng Anh" },
+      {
+        name: "twitter:description",
+        content:
+          "Khám phá hành trình 100 ngày tự học tiếng Anh của Vũ Văn Hà Công (Hà Công). Theo dõi bài học mỗi ngày, từ vựng, tài liệu và tiến độ học tập.",
+      },
     ],
     links: [
       {
